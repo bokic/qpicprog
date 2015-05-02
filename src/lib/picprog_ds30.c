@@ -310,23 +310,16 @@ MY_EXPORT void picprog_ds30_write_program(PICPROG_HANDLE handle, uint16_t *buffe
     for(c = 0; c < 8; c++)
     {
         // Step 4: Initialize the read pointer (W6) and load W0:W5 with the next 4 instruction words to program.
-        uint32_t tt;
-        tt = 0x200000 | (*buffer << 4);
         picprog_ds30_write_command(handle, 0x200000 | (*buffer << 4)); // MOV #<LSW0>, W0
         buffer++;
-        tt = 0x200001 | (*buffer << 4);
         picprog_ds30_write_command(handle, 0x200001 | (*buffer << 4)); // MOV #<MSB1:MSB0>, W1
         buffer++;
-        tt = 0x200002 | (*buffer << 4);
         picprog_ds30_write_command(handle, 0x200002 | (*buffer << 4)); // MOV #<LSW1>, W2
         buffer++;
-        tt = 0x200003 | (*buffer << 4);
         picprog_ds30_write_command(handle, 0x200003 | (*buffer << 4)); // MOV #<LSW2>, W3
         buffer++;
-        tt = 0x200004 | (*buffer << 4);
         picprog_ds30_write_command(handle, 0x200004 | (*buffer << 4)); // MOV #<MSB3:MSB2>, W4
         buffer++;
-        tt = 0x200005 | (*buffer << 4);
         picprog_ds30_write_command(handle, 0x200005 | (*buffer << 4)); // MOV #<LSW3>, W5
         buffer++;
 

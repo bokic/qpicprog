@@ -507,8 +507,6 @@ MY_EXPORT void picprog_ds33_ds24_write_config_memory(PICPROG_HANDLE handle, uint
     for(c = 0; c < 12; c++)
 	{
 		// Step 5: Load the Configuration register data to W6.
-        uint32_t tt;
-        tt = 0x200000 | (*buffer << 4);
         picprog_ds33_ds24_write_command(handle, 0x200000 | (*buffer << 4)); // MOV #<CONFIG_VALUE>, W0
 
 		// Step 6: Write the Configuration register data to the write latch and increment the write pointer.

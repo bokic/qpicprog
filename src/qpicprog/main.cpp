@@ -113,10 +113,6 @@ void picds33_flash_led()
         picprog_ds33_ds24_write_command(handle, 0x040200); // GOTO 0x200
         picprog_ds33_ds24_write_command(handle, 0x040200); // GOTO 0x200
         picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
-
-        picprog_ds33_ds24_write_command(handle, 0xA8832C); // BSET.B	ADPCFGbits, #4
-        picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
-        picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
         picprog_ds33_ds24_write_command(handle, 0xA982C8); // BCLR	TRISBbits, #4
         picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
         picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
@@ -163,14 +159,17 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
     {
         QList<QHexRow> data = hex.data();
 
+        /// chip erase - with reset
+        picprog_ds33_ds24_enter_icsp(prg_handle);
+        picprog_ds33_ds24_bulk_erase(prg_handle);
+        picprog_ds33_ds24_exit_icsp(prg_handle);
+
+
         picprog_ds33_ds24_enter_icsp(prg_handle);
 
-        /// chip erase
-        picprog_ds33_ds24_bulk_erase(prg_handle);
-
-        /*uint16_t tttt[128];
+        uint16_t tttt[12];
         memset(tttt, 0x22, sizeof(tttt));
-        picprog_ds33_ds24_read_config_memory(prg_handle, tttt);*/
+        picprog_ds33_ds24_read_config_memory(prg_handle, tttt);
 
         /// setup code buffer
         QByteArray buffer;
@@ -239,17 +238,18 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
 
         for(int prg_segment = 0; prg_segment < prg_segments; prg_segment++)
         {
-            picprog_ds33_ds24_write_program(prg_handle, (uint8_t *)buffer.constData() + (prg_segment * 192), prg_segment * 128);
+            picprog_ds33_ds24_write_program(prg_handle, (uint8_t *)buffer.constData() + (prg_segment * 256), prg_segment * 128);
             Sleep(10);
         }
 
         //uint16_t app_id = picprog_ds33_ds24_read_app_id(prg_handle);
 
         /// Verify program code
-        /*QByteArray verify_buffer;
+        QByteArray verify_buffer;
         verify_buffer.resize(buffer.size());
+        verify_buffer.fill(0x11);
 
-        picprog_ds33_ds24_read_program(prg_handle, (uint16_t *)verify_buffer.data(), 0, buffer.size() / (2 * 6));
+        /*picprog_ds33_ds24_read_program(prg_handle, (uint16_t *)verify_buffer.data(), 0, buffer.size() / (2 * 6));
 
         if (buffer != verify_buffer)
         {
@@ -265,7 +265,7 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
             config_data.resize(24);
             config_data[0] = 0xCF;
             config_data[1] = 0;
-            config_data[2] = 0xCF;
+            config_data[2] = 0x07;
             config_data[3] = 0;
             config_data[4] = 0x07;
             config_data[5] = 0;
@@ -275,7 +275,7 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
             config_data[9] = 0;
             config_data[10] = 0x5F;
             config_data[11] = 0;
-            config_data[12] = 0x17;
+            config_data[12] = 0xF7;
             config_data[13] = 0;
             config_data[14] = 0xC3;
             config_data[15] = 0;
@@ -327,7 +327,7 @@ int main(int argc, char *argv[])
     //picds33_read_test(); return 0;
     //picds30_test();return 0;
     //picds33_test();return 0;
-    picds33_flash_led();return 0;
+    //picds33_flash_led();return 0;
 
     QApplication app(argc, argv);
 

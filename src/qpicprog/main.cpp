@@ -26,20 +26,24 @@ void picds30_read_test()
 
         memset(buffer, 1, sizeof(buffer));
 
-        picprog_ds30_bulk_erase(prg_handle);
+        //picprog_ds30_bulk_erase(prg_handle);
 
-        picprog_ds30_write_program(prg_handle, buffer, 0);
+        //picprog_ds30_write_program(prg_handle, buffer, 0);
 
-        picprog_ds30_read_program(prg_handle, buffer, 0, 8);
+        uint16_t config[12];
+        picprog_ds30_read_config_memory(prg_handle, config);
+        //picprog_ds30_read_program(prg_handle, buffer, 0, 8);
 
-        if (buffer[0] == 0x0101)
+        /*if (buffer[0] == 0x0101)
         {
             printf("Successfull write and read operations.\n");
         }
         else
         {
             printf("Write and read operations FAILED.\n");
-        }
+        }*/
+
+        picprog_ds30_exit_icsp(prg_handle);
 
         picprog_close(prg_handle);
     }
@@ -57,7 +61,7 @@ void picds33_read_test()
 
         memset(buffer, 0, sizeof(buffer));
 
-        picprog_ds33_ds24_bulk_erase(prg_handle);
+        //picprog_ds33_ds24_bulk_erase(prg_handle);
 
         picprog_ds33_ds24_read_program(prg_handle, buffer, 0, 1);
 
@@ -104,6 +108,36 @@ void picds33_test()
         picprog_close(prg_handle);
     }
 
+}
+
+void picds30_flash_led()
+{
+    PICPROG_HANDLE handle = picprog_open();
+
+    if (handle != NULL)
+    {
+        picprog_ds30_enter_icsp(handle);
+
+        picprog_ds30_write_command(handle, 0x040200); // GOTO 0x200
+        picprog_ds30_write_command(handle, 0x040200); // GOTO 0x200
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+        picprog_ds30_write_command(handle, 0xA982C8); // BCLR	TRISBbits, #4
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+        picprog_ds30_write_command(handle, 0xAA82CC); // BTG	LATBbits, #4
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+        picprog_ds30_write_command(handle, 0xAA82CC); // BTG	LATBbits, #4
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+        picprog_ds30_write_command(handle, 0xAA82CC); // BTG	LATBbits, #4
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+
+        picprog_ds30_exit_icsp(handle);
+
+        picprog_close(handle);
+    }
 }
 
 void picds33_flash_led()
@@ -171,9 +205,12 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
 
         picprog_ds33_ds24_enter_icsp(prg_handle);
 
-        uint16_t tttt[12];
-        memset(tttt, 0x22, sizeof(tttt));
-        picprog_ds33_ds24_read_config_memory(prg_handle, tttt);
+        /// TODO: Test code for delete
+        //uint16_t tttt[24];
+        //uint8_t tttt[48];
+        //memset(tttt, 0x22, sizeof(tttt));
+        //picprog_ds33_ds24_read_config_memory(prg_handle, (uint16_t *)tttt);
+        /// delete til here
 
         /// setup code buffer
         QByteArray buffer;
@@ -191,34 +228,6 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
 
             memcpy(buffer.data() + row.m_Address, segment.constData(), segment.length());
         }
-
-        /*buffer[0] = 0x11;
-        buffer[1] = 0x12;
-        buffer[2] = 0x13;
-
-        buffer[3] = 0x21;
-        buffer[4] = 0x22;
-        buffer[5] = 0x23;
-
-        buffer[6] = 0x31;
-        buffer[7] = 0x32;
-        buffer[8] = 0x33;
-
-        buffer[9] = 0x41;
-        buffer[10] = 0x42;
-        buffer[11] = 0x43;
-
-        buffer[12] = 0x51;
-        buffer[13] = 0x52;
-        buffer[14] = 0x53;
-
-        buffer[15] = 0x61;
-        buffer[16] = 0x62;
-        buffer[17] = 0x63;
-
-        buffer[18] = 0x71;
-        buffer[19] = 0x72;
-        buffer[20] = 0x73;*/
 
         /// Program code memory
         int firmware_size = 0;
@@ -249,11 +258,11 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
         //uint16_t app_id = picprog_ds33_ds24_read_app_id(prg_handle);
 
         /// Verify program code
-        QByteArray verify_buffer;
+        /*QByteArray verify_buffer;
         verify_buffer.resize(buffer.size());
         verify_buffer.fill(0x11);
 
-        /*picprog_ds33_ds24_read_program(prg_handle, (uint16_t *)verify_buffer.data(), 0, buffer.size() / (2 * 6));
+        picprog_ds33_ds24_read_program(prg_handle, (uint16_t *)verify_buffer.data(), 0, buffer.size() / (2 * 6));
 
         if (buffer != verify_buffer)
         {
@@ -266,49 +275,28 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
         {
             QByteArray config_data = data.at(data.count() - 2).m_Data;
 
-            config_data.resize(24);
-            config_data[0] = 0xCF;
-            config_data[1] = 0;
-            config_data[2] = 0x07;
-            config_data[3] = 0;
-            config_data[4] = 0x07;
-            config_data[5] = 0;
-            config_data[6] = 0x06;
-            config_data[7] = 0;
-            config_data[8] = 0xA3;
-            config_data[9] = 0;
-            config_data[10] = 0x5F;
-            config_data[11] = 0;
-            config_data[12] = 0xF7;
-            config_data[13] = 0;
-            config_data[14] = 0xC3;
-            config_data[15] = 0;
-            config_data[16] = 0;
-            config_data[17] = 0;
-            config_data[18] = 0;
-            config_data[19] = 0;
-            config_data[20] = 0;
-            config_data[21] = 0;
-            config_data[22] = 0;
-            config_data[23] = 0;
-
-            if (config_data.length() >= 24)
+            while(config_data.length() < 48)
             {
-                config_data.resize(24);
+                config_data.append('\0');
+            }
 
-                picprog_ds33_ds24_write_config_memory(prg_handle, (uint16_t *)config_data.data());
+            if (config_data.length() != 48)
+            {
+                config_data.resize(48);
+            }
 
-                QByteArray verify_config_data;
+            picprog_ds33_ds24_write_config_memory(prg_handle, (uint16_t *)config_data.data());
 
-                verify_config_data.resize(24);
+            QByteArray verify_config_data;
 
-                picprog_ds33_ds24_read_config_memory(prg_handle, (uint16_t *)verify_config_data.data());
+            verify_config_data.resize(48);
 
-                if (config_data != verify_config_data)
-                {
-                    QMessageBox::critical(NULL, QObject::tr("Error"), QObject::tr("Verify config memory failed."));
-                    ret = -332;
-                }
+            picprog_ds33_ds24_read_config_memory(prg_handle, (uint16_t *)verify_config_data.data());
+
+            if (config_data != verify_config_data)
+            {
+                QMessageBox::critical(NULL, QObject::tr("Error"), QObject::tr("Verify config memory failed."));
+                ret = -332;
             }
         }
 
@@ -327,10 +315,11 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
 
 int main(int argc, char *argv[])
 {
-    //picds30_read_test(); return 0;
+    picds30_read_test(); return 0;
     //picds33_read_test(); return 0;
     //picds30_test();return 0;
     //picds33_test();return 0;
+    //picds30_flash_led(); return 0;
     //picds33_flash_led();return 0;
 
     QApplication app(argc, argv);

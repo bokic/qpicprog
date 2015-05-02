@@ -61,7 +61,7 @@ MY_EXPORT void PIC16f87x_WriteData(PICPROG_HANDLE handle, uint16_t data)
         adv_delayn(100);
     }
 
-    picprog_set_data(handle);
+    picprog_set_data(handle); // TODO: I thing here should be clear data instead.
 
     adv_delayu(1);
 }

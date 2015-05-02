@@ -35,7 +35,6 @@
 struct FT_PicProgHandle
 {
     uint8_t start;
-    bool is_first_command;
     FT_HANDLE ft_handle;
     uint8_t ft_port_status;
     uint8_t end;
@@ -51,7 +50,6 @@ MY_EXPORT PICPROG_HANDLE picprog_open()
         ret = malloc(sizeof(struct FT_PicProgHandle));
 
         FT_CAST(ret)->start = '+';
-        FT_CAST(ret)->is_first_command = true;
         FT_CAST(ret)->ft_handle = ft_handle;
         FT_CAST(ret)->ft_port_status = 0;
         FT_CAST(ret)->end = '-';
@@ -131,21 +129,11 @@ MY_EXPORT void picprog_set_data_pin_as_input(PICPROG_HANDLE handle)
 
 MY_EXPORT void picprog_set_data_pin_as_output(PICPROG_HANDLE handle)
 {
-    picprog_set_data(handle);
+    picprog_clear_data(handle);
 }
 
 MY_EXPORT void picprog_toggle_clock(PICPROG_HANDLE handle)
 {
     FT_CAST(handle)->ft_port_status = PICPROG_TOGGLE_CLOCK(FT_CAST(handle)->ft_port_status);
     FT_SetBitMode(FT_CAST(handle)->ft_handle, FT_CAST(handle)->ft_port_status, FT_BITMODE_CBUS_BITBANG);
-}
-
-MY_EXPORT void picprog_set_first_commmand(PICPROG_HANDLE handle, bool value)
-{
-    FT_CAST(handle)->is_first_command = value;
-}
-
-MY_EXPORT bool picprog_get_first_commmand(PICPROG_HANDLE handle)
-{
-    return FT_CAST(handle)->is_first_command;
 }

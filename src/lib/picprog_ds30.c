@@ -15,18 +15,26 @@
 
 MY_EXPORT void picprog_ds30_enter_icsp(PICPROG_HANDLE handle)
 {
-    picprog_set_first_commmand(handle, true);
-
     picprog_clear_all(handle);
-    adv_delaym(100);
+    adv_delayn(100);
     picprog_set_mclr(handle);
-    adv_delaym(4);
+    adv_delaym(260);
     picprog_clear_mclr(handle);
-    adv_delayu(10);
+    adv_delayu(100);
     picprog_set_mclr(handle);
     adv_delaym(4);
+
+    //picprog_clear_data(handle);
+    //picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    //picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    //picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    //picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    //picprog_toggle_clock(handle);picprog_toggle_clock(handle);
 
     picprog_ds30_write_command(handle, 0x000000); // NOP
+    picprog_ds30_write_command(handle, 0x000000); // NOP
+    //picprog_ds30_write_command(handle, 0x040100); // GOTO 0x100
+    //picprog_ds30_write_command(handle, 0x000000); // NOP
     //picprog_ds30_write_command(handle, 0x000000); // NOP
 }
 
@@ -73,6 +81,7 @@ MY_EXPORT void picprog_ds30_write16(PICPROG_HANDLE handle, uint16_t data)
 
 MY_EXPORT uint8_t picprog_ds30_read_bit(PICPROG_HANDLE handle)
 {
+    return 0;
 }
 
 MY_EXPORT void picprog_ds30_wait_for_recieve_ready(PICPROG_HANDLE handle)
@@ -92,22 +101,14 @@ MY_EXPORT void picprog_ds30_write_command(PICPROG_HANDLE handle, uint32_t comman
 {
     int c;
 
+    picprog_clear_data(handle);
+
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
 
-    if (picprog_get_first_commmand(handle) == true)
-    {
-        picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-        picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-        picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-        picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-        picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-        picprog_set_first_commmand(handle, false);
-    }
-
-    adv_delayn(100);
+    adv_delayn(20); // P4
 
     for(c = 0; c < 24; c++)
     {
@@ -126,7 +127,9 @@ MY_EXPORT void picprog_ds30_write_command(PICPROG_HANDLE handle, uint32_t comman
         command >>= 1;
     }
 
-    adv_delayn(20);
+    picprog_clear_data(handle);
+
+    adv_delayn(20); // P4a
 }
 
 MY_EXPORT uint16_t picprog_ds30_read_command(PICPROG_HANDLE handle)
@@ -134,21 +137,23 @@ MY_EXPORT uint16_t picprog_ds30_read_command(PICPROG_HANDLE handle)
     uint16_t ret = 0;
     int c;
 
-    picprog_set_data(handle);picprog_toggle_clock(handle);picprog_clear_data(handle);picprog_toggle_clock(handle);
+    picprog_set_data(handle);picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    picprog_clear_data(handle);picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-    adv_delayn(100);
-    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    adv_delayn(20); // P4
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-    adv_delayn(100);
+    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+
     picprog_set_data_pin_as_input(handle);
+
+    adv_delayn(20); // P5
 
     for(c = 0; c < 16; c++)
     {
@@ -163,7 +168,8 @@ MY_EXPORT uint16_t picprog_ds30_read_command(PICPROG_HANDLE handle)
     }
 
     picprog_set_data_pin_as_output(handle);
-    adv_delayn(100);
+
+    adv_delayn(20); // P4a
 
     return ret;
 }
@@ -377,6 +383,41 @@ MY_EXPORT void picprog_ds30_write_program(PICPROG_HANDLE handle, uint16_t *buffe
 
 MY_EXPORT void picprog_ds30_read_config_memory(PICPROG_HANDLE handle, uint16_t *buffer)
 {
+    int c;
+
+    // Step 1: Exit Reset Vector
+    picprog_ds30_write_command(handle, 0x040100); // GOTO 0x100
+    picprog_ds30_write_command(handle, 0x040100); // GOTO 0x100
+    picprog_ds30_write_command(handle, 0x000000); // NOP
+
+    // Step 2: Initialize TBLPAG, and the read pointer (W6) and the write pointer (W7) for TBLRDinstruction.
+    picprog_ds30_write_command(handle, 0x200F80); // MOV #0xF8, W0
+    picprog_ds30_write_command(handle, 0x880190); // MOV W0, TBLPAG
+    picprog_ds30_write_command(handle, 0xEB0300); // CLR W6
+    picprog_ds30_write_command(handle, 0xEB0380); // CLR W7
+    picprog_ds30_write_command(handle, 0x000000); // NOP
+
+    // Step 6: Repeat steps 3-5 six times to read all of configuration memory.
+    for (c = 0; c < 6; c++)
+    {
+        // Step 3: Read the Configuration register and write it to the VISI register (located at 0x784).
+        picprog_ds30_write_command(handle, 0xBA0BB6); // TBLRDL [W6++], [W7]
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+        picprog_ds30_write_command(handle, 0x883C20); // MOV W0, VISI
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+
+        // Step 4: Output the VISI registerusing the REGOUT command.
+        *buffer = picprog_ds30_read_command(handle);
+        buffer++;
+        *buffer = 0;
+        buffer++;
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+
+        // Step 5: Reset device internal PC.
+        picprog_ds30_write_command(handle, 0x040100); // GOTO 0x100
+        picprog_ds30_write_command(handle, 0x000000); // NOP
+    }
 }
 
 MY_EXPORT void picprog_ds30_write_config_memory(PICPROG_HANDLE handle, uint16_t *buffer)

@@ -52,8 +52,8 @@ MY_EXPORT void adv_delayu(uint32_t interval)
 }
 
 #ifdef __GNUC__
-//#pragma GCC diagnostic(push)
-//#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+//#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 #endif
 
 inline uint64_t RDTSC()
@@ -62,6 +62,7 @@ inline uint64_t RDTSC()
 }
 
 #ifdef __GNUC__
+#pragma GCC diagnostic warning "-Wreturn-type"
 //#pragma GCC diagnostic pop
 #endif
 

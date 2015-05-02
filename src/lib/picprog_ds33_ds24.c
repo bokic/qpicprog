@@ -28,7 +28,11 @@ MY_EXPORT void picprog_ds33_ds24_enter_icsp(PICPROG_HANDLE handle)
 	
     adv_delaym(25);
 
-    picprog_set_first_commmand(handle, true);
+    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
 }
 
 MY_EXPORT void picprog_ds33_ds24_exit_icsp(PICPROG_HANDLE handle)
@@ -75,6 +79,8 @@ MY_EXPORT void picprog_ds33_ds24_write32(PICPROG_HANDLE handle, uint32_t data)
 
 		data <<= 1;
 	}
+
+    picprog_clear_data(handle);
 }
 
 MY_EXPORT void picprog_ds33_ds24_write16(PICPROG_HANDLE handle, uint16_t data)
@@ -93,6 +99,8 @@ MY_EXPORT void picprog_ds33_ds24_write16(PICPROG_HANDLE handle, uint16_t data)
 
 		data <<= 1;
 	}
+
+    picprog_clear_data(handle);
 }
 
 MY_EXPORT void picprog_ds33_ds24_read_buffer(PICPROG_HANDLE handle, void* buffer, uint32_t size)
@@ -155,18 +163,6 @@ MY_EXPORT void picprog_ds33_ds24_write_command(PICPROG_HANDLE handle, uint32_t c
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     adv_delayn(100);
 
-    if (picprog_get_first_commmand(handle) == true)
-	{
-        picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-        picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-        picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-        picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-        picprog_toggle_clock(handle);picprog_toggle_clock(handle);
-        adv_delayn(100);
-		
-        picprog_set_first_commmand(handle, false);
-    }
-	
     for(c = 0; c < 24; c++)
 	{
         if ((command & 1) == 0)
@@ -183,6 +179,9 @@ MY_EXPORT void picprog_ds33_ds24_write_command(PICPROG_HANDLE handle, uint32_t c
 
         command >>= 1;
 	}
+
+    picprog_clear_data(handle);
+
     adv_delayn(100);
 }
 
@@ -191,8 +190,8 @@ MY_EXPORT uint16_t picprog_ds33_ds24_read_command(PICPROG_HANDLE handle)
     uint16_t ret = 0;
     int c;
 
-    picprog_set_data(handle);picprog_toggle_clock(handle);picprog_clear_data(handle);picprog_toggle_clock(handle);
-    picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    picprog_set_data(handle);picprog_toggle_clock(handle);picprog_toggle_clock(handle);
+    picprog_clear_data(handle);picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     adv_delayn(100);
@@ -464,7 +463,8 @@ MY_EXPORT void picprog_ds33_ds24_read_config_memory(PICPROG_HANDLE handle, uint1
         picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
 
         *buffer = picprog_ds33_ds24_read_command(handle);
-
+        buffer++;
+        *buffer = 0;
         buffer++;
 
 	}// Step 4: Repeat step 3 twelve times to read all the Configuration registers.
@@ -526,7 +526,7 @@ MY_EXPORT void picprog_ds33_ds24_write_config_memory(PICPROG_HANDLE handle, uint
 				break;
 		}
 
-        buffer++;
+        buffer += 2;
 	}
 }
 

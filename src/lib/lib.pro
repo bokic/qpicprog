@@ -33,3 +33,5 @@ HEADERS           += export.h
 win32:LIBS        += ../../libs/ftdi_win/win32/ftd2xx.lib
 win64:LIBS        += ../../libs/ftdi_win/win64/ftd2xx.lib
 unix:LIBS         += -L../../libs/ftdi_linux/32 -lftd2xx
+
+win32: LIBS       += advapi32.lib

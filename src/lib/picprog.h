@@ -12,6 +12,10 @@
 
 typedef void* PICPROG_HANDLE;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern MY_EXPORT PICPROG_HANDLE picprog_open();
 extern MY_EXPORT void picprog_close(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_clear_all(PICPROG_HANDLE handle);
@@ -23,8 +27,11 @@ extern MY_EXPORT uint8_t picprog_read_data_bit(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_set_data_pin_as_input(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_set_data_pin_as_output(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_toggle_clock(PICPROG_HANDLE handle);
-
 extern MY_EXPORT void picprog_set_first_commmand(PICPROG_HANDLE handle, bool value);
 extern MY_EXPORT bool picprog_get_first_commmand(PICPROG_HANDLE handle);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PICPROG_H

@@ -14,7 +14,11 @@ class QHexLoader : public QObject
 {
 public:
     QHexLoader(const QString &p_Filename = "", QObject *parent = NULL);
-    bool Load(const QString &p_Filename);
+    bool load(const QString &p_Filename);
+
+    QList<QHexRow> data();
+
+private:
 
     QList<QHexRow> m_Rows;
 };

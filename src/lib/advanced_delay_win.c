@@ -9,7 +9,6 @@
 #include <stdint.h>
 
 uint32_t usec = 0;
-uint32_t cycles; // TODO: due to lack of gnu asm syntax I use temp var. Please fix me as it should be.
 
 
 MY_EXPORT void adv_delay_setup()
@@ -54,9 +53,7 @@ MY_EXPORT void adv_delayu(uint32_t interval)
 
 uint64_t RDTSC()
 {
-    __asm__ (
-        "   RDTSC\n"
-    );
+    __asm__("RDTSC\n");
 }
 
 MY_EXPORT void adv_delayn(uint32_t interval)
@@ -68,7 +65,7 @@ MY_EXPORT void adv_delayn(uint32_t interval)
         adv_delay_setup();
     }
 
-    cycles = (usec * interval) / 1000;
+    uint64_t cycles = (usec * interval) / 1000;
 
     while(true)
     {

@@ -31,14 +31,52 @@ MY_EXPORT void picprog_ds_enter_icsp(PICPROG_HANDLE handle)
 
 MY_EXPORT void picprog_ds_exit_icsp(PICPROG_HANDLE handle)
 {
+    picprog_clear_mclr(handle);
+    adv_delaym(10);
     picprog_set_mclr(handle);
-    adv_delayn(100);
-    picprog_clear_all(handle);
-    adv_delaym(25);
+    adv_delaym(10);
 }
 
-MY_EXPORT void picprog_ds_toggle_clock(PICPROG_HANDLE handle)
+MY_EXPORT uint16_t picprog_ds_read_application_id(PICPROG_HANDLE handle)
 {
+    uint16_t ret = 0;
+    int c;
+
+    // Step 1: Exit Reset Vector
+    picprog_ds_write_command(handle, 0x040200); // GOTO 0x200
+    picprog_ds_write_command(handle, 0x040200); // GOTO 0x200
+    picprog_ds_write_command(handle, 0x000000); // NOP
+
+    // Step 2: Initialize TBLPAG and the read pointer (W0) for TBLRD instruction.
+    picprog_ds_write_command(handle, 0x200800); // MOV #0x80, W0
+    picprog_ds_write_command(handle, 0x880190); // MOV W0, TBLPAG
+    picprog_ds_write_command(handle, 0x207F00); // MOV #0x7FO, W0
+    picprog_ds_write_command(handle, 0x207841); // MOV #VISI, W1
+    picprog_ds_write_command(handle, 0x000000); // NOP
+    picprog_ds_write_command(handle, 0xBA0890); // TBLRDL [W0], [W1]
+    picprog_ds_write_command(handle, 0x000000); // NOP
+    picprog_ds_write_command(handle, 0x000000); // NOP
+
+    // Step 3: Output the VISI register using the REGOUT command.
+    adv_delayn(100);
+    picprog_set_data_pin_as_input(handle);
+    adv_delayn(100);
+
+    for(c = 0; c < 16; c++)
+    {
+        ret >>= 1;
+
+        picprog_toggle_clock(handle);
+
+        if (picprog_read_data_bit(handle) != 0)
+            ret |= 0x8000;
+
+        picprog_toggle_clock(handle);
+    }
+
+    picprog_set_data_pin_as_output(handle);
+
+    return ret;
 }
 
 MY_EXPORT void picprog_ds_write32(PICPROG_HANDLE handle, uint32_t data)
@@ -102,7 +140,7 @@ MY_EXPORT void picprog_ds_read_buffer(PICPROG_HANDLE handle, void* buffer, uint3
 
     for(c = 0; c < size; c++)
 	{
-        for(c2 = 15; c2 >= 0; c2++)
+        for(c2 = 15; c2 >= 0; c2--)
 		{
             picprog_toggle_clock(handle);
             *word = *word | ((picprog_read_data_bit(handle) & 0x01) << c2);
@@ -120,7 +158,15 @@ MY_EXPORT void picprog_ds_read_buffer(PICPROG_HANDLE handle, void* buffer, uint3
 
 MY_EXPORT uint32_t picprog_ds_sanity_check(PICPROG_HANDLE handle)
 {
-    uint32_t ret = 0x00000000;
+    picprog_ds_write_command(handle, 0x0001);
+
+    uint16_t ret1 = picprog_ds_read_command(handle);
+    uint16_t ret2 = picprog_ds_read_command(handle);
+
+    return (uint32_t)(ret1 << 16) | ret2;
+
+
+    /*uint32_t ret = 0x00000000;
 
     picprog_ds_write16(handle, 0x1000);
 
@@ -130,7 +176,7 @@ MY_EXPORT uint32_t picprog_ds_sanity_check(PICPROG_HANDLE handle)
 
     picprog_ds_read_buffer(handle, &ret, 2); // 2 words.
 
-	return ret;
+    return ret;*/
 }
 
 MY_EXPORT void picprog_ds_write_command(PICPROG_HANDLE handle, uint32_t command)
@@ -143,7 +189,7 @@ MY_EXPORT void picprog_ds_write_command(PICPROG_HANDLE handle, uint32_t command)
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     adv_delayn(100);
 
-    if (picprog_get_first_commmand(handle) == true)
+    /*if (picprog_get_first_commmand(handle) == true)
 	{
         picprog_toggle_clock(handle);picprog_toggle_clock(handle);
         picprog_toggle_clock(handle);picprog_toggle_clock(handle);
@@ -153,7 +199,7 @@ MY_EXPORT void picprog_ds_write_command(PICPROG_HANDLE handle, uint32_t command)
         adv_delayn(100);
 		
         picprog_set_first_commmand(handle, false);
-	}
+    }*/
 	
     for(c = 0; c < 24; c++)
 	{
@@ -232,9 +278,9 @@ MY_EXPORT void picprog_ds_bulk_erase(PICPROG_HANDLE handle)
     picprog_ds_write_command(handle, 0x000000); // NOP
     picprog_ds_write_command(handle, 0x000000); // NOP
 
-    Sleep(330);
+    adv_delaym(330);
 
-	// Step 4: Wait for Bulk Erase operation to complete and make sure WR bit is clear.
+    // Step 4: Wait for Bulk Erase operation to complete and make sure WR bit is clear.
 	for(;;)
 	{
         picprog_ds_write_command(handle, 0x803B00); // MOV NVMCON, W0
@@ -247,6 +293,8 @@ MY_EXPORT void picprog_ds_bulk_erase(PICPROG_HANDLE handle)
 		if ((NVMCON & 0x8000) == 0)
 			break;
 	}
+
+    adv_delaym(330);
 }
 
 MY_EXPORT void picprog_ds_read_program(PICPROG_HANDLE handle, uint16_t* buffer, uint32_t address, uint32_t size)
@@ -394,7 +442,7 @@ MY_EXPORT void picprog_ds_write_program(PICPROG_HANDLE handle, uint16_t *buffer,
     picprog_ds_write_command(handle, 0x000000); // NOP
     picprog_ds_write_command(handle, 0x000000); // NOP
 
-    Sleep(2);
+    adv_delaym(2);
 
 	for(;;) // Step 8: Wait for Row Program operation to complete and make sure WR bit is clear.
 	{
@@ -406,7 +454,9 @@ MY_EXPORT void picprog_ds_write_program(PICPROG_HANDLE handle, uint16_t *buffer,
         picprog_ds_write_command(handle, 0x000000); // NOP
 
 		if ((NVMCON & 0x8000) == 0)
+        {
 			break;
+        }
 	}
 }
 
@@ -482,7 +532,7 @@ MY_EXPORT void picprog_ds_write_config_memory(PICPROG_HANDLE handle, uint16_t *b
         picprog_ds_write_command(handle, 0x000000); // NOP
 
 		// Step 8: Wait for the Configuration Register Write operation to complete and make sure WR bit is clear.
-        Sleep(25);
+        adv_delaym(25);
 		for(;;) // Step 8: Wait for Row Program operation to complete and make sure WR bit is clear.
 		{
             picprog_ds_write_command(handle, 0x803B00); // MOV NVMCON, W0

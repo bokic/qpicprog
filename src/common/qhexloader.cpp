@@ -7,11 +7,11 @@ QHexLoader::QHexLoader(const QString &p_Filename, QObject *parent)
 {
     if (!p_Filename.isEmpty())
     {
-        Load(p_Filename);
+        load(p_Filename);
     }
 }
 
-bool QHexLoader::Load(const QString& p_Filename)
+bool QHexLoader::load(const QString& p_Filename)
 {
     QFile file(p_Filename);
     if (file.open(QIODevice::ReadOnly) == true)
@@ -96,4 +96,9 @@ bool QHexLoader::Load(const QString& p_Filename)
         return false;
 
     return true;
+}
+
+QList<QHexRow> QHexLoader::data()
+{
+    return m_Rows;
 }

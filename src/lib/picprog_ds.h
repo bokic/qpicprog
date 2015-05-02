@@ -7,8 +7,13 @@
 
 #include <stdint.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern MY_EXPORT void picprog_ds_enter_icsp(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_ds_exit_icsp(PICPROG_HANDLE handle);
+extern MY_EXPORT uint16_t picprog_ds_read_application_id(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_ds_write32(PICPROG_HANDLE handle, uint32_t data);
 extern MY_EXPORT void picprog_ds_write16(PICPROG_HANDLE handle, uint16_t data);
 extern MY_EXPORT uint8_t picprog_ds_read_bit(PICPROG_HANDLE handle);
@@ -23,5 +28,9 @@ extern MY_EXPORT void picprog_ds_write_program(PICPROG_HANDLE handle, uint16_t *
 extern MY_EXPORT void picprog_ds_read_config_memory(PICPROG_HANDLE handle, uint16_t *buffer);
 extern MY_EXPORT void picprog_ds_write_config_memory(PICPROG_HANDLE handle, uint16_t *buffer);
 extern MY_EXPORT uint16_t picprog_ds_read_app_id(PICPROG_HANDLE handle);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PICPROG_DSPIC_H

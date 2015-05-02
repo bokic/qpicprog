@@ -96,15 +96,15 @@ void QMainDialog::on_programAllFromFileButton_clicked()
 
     QHexLoader l_Hex;
 
-    if (l_Hex.Load(m_FileName) != false)
+    if (l_Hex.load(m_FileName) != false)
     {
         QByteArray buf;
         buf.resize(128 * 1024); // TODO: Get len from programmer member.
         buf.fill(0xFF);
 
-        for(int c = 0; c < l_Hex.m_Rows.length(); c++)
+        for(int c = 0; c < l_Hex.data().length(); c++)
         {
-            QHexRow l_Row = l_Hex.m_Rows.at(c);
+            QHexRow l_Row = l_Hex.data().at(c);
             if (l_Row.m_Type == 0x00)
             {
                 for(int c2 = 0; c2 < l_Row.m_Data.size(); c2++)
@@ -114,7 +114,7 @@ void QMainDialog::on_programAllFromFileButton_clicked()
             }
         }
 
-        int size = l_Hex.m_Rows.length();
+        int size = l_Hex.data().length();
         size++;
     }
 }

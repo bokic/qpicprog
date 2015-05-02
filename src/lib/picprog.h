@@ -18,6 +18,7 @@ extern "C" {
 
 extern MY_EXPORT PICPROG_HANDLE picprog_open();
 extern MY_EXPORT void picprog_close(PICPROG_HANDLE handle);
+extern MY_EXPORT void picprog_set_all_as_input(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_clear_all(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_set_mclr(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_clear_mclr(PICPROG_HANDLE handle);

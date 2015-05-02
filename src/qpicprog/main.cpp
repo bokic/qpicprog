@@ -5,11 +5,89 @@
 #include <advanced_delay.h>
 #include <picprog_16f87x.h>
 #include <picprog_ds33_ds24.h>
+#include <picprog_ds30.h>
 #include <picprog.h>
 
 #include <qhexloader.h>
 
 #include <stdio.h>
+
+void picds30_read_test()
+{
+    PICPROG_HANDLE prg_handle = picprog_open();
+
+    if (prg_handle != NULL)
+    {
+        picprog_ds30_enter_icsp(prg_handle);
+
+        uint16_t buffer[1024];
+
+        memset(buffer, 1, sizeof(buffer));
+
+        picprog_ds30_write_program(prg_handle, buffer, 0);
+
+        picprog_ds30_read_program(prg_handle, buffer, 0, 1);
+
+        picprog_close(prg_handle);
+    }
+}
+
+void picds33_read_test()
+{
+    PICPROG_HANDLE prg_handle = picprog_open();
+
+    if (prg_handle != NULL)
+    {
+        picprog_ds33_ds24_enter_icsp(prg_handle);
+
+        uint16_t buffer[1024];
+
+        memset(buffer, 0, sizeof(buffer));
+
+        picprog_ds33_ds24_read_program(prg_handle, buffer, 0, 1);
+
+        picprog_close(prg_handle);
+    }
+}
+
+void picds30_test()
+{
+    PICPROG_HANDLE prg_handle = picprog_open();
+
+    if (prg_handle != NULL)
+    {
+        picprog_ds30_enter_icsp(prg_handle);
+
+        uint16_t app_id = picprog_ds30_read_application_id(prg_handle);
+
+        if (app_id != 0xBB)
+        {
+            //
+        }
+
+        picprog_close(prg_handle);
+    }
+}
+
+void picds33_test()
+{
+    PICPROG_HANDLE prg_handle = picprog_open();
+
+    if (prg_handle != NULL)
+    {
+        picprog_ds33_ds24_enter_icsp(prg_handle);
+
+        uint16_t app_id = picprog_ds33_ds24_read_application_id(prg_handle);
+
+        if (app_id != 0xBB)
+        {
+            //
+        }
+
+        picprog_close(prg_handle);
+    }
+
+}
 
 void picds33_flash_led()
 {
@@ -166,7 +244,11 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
 
 int main(int argc, char *argv[])
 {
-    picds33_flash_led();return 0;
+    picds30_read_test(); return 0;
+    //picds33_read_test(); return 0;
+    //picds30_test();return 0;
+    //picds33_test();return 0;
+    //picds33_flash_led();return 0;
 
     QApplication app(argc, argv);
 

@@ -33,10 +33,9 @@ MY_EXPORT void picprog_ds33_ds24_enter_icsp(PICPROG_HANDLE handle)
 
 MY_EXPORT void picprog_ds33_ds24_exit_icsp(PICPROG_HANDLE handle)
 {
-    picprog_clear_mclr(handle);
+    picprog_clear_all(handle);
     adv_delaym(10);
-    picprog_set_mclr(handle);
-    adv_delaym(10);
+    picprog_set_all_as_input(handle);
 }
 
 MY_EXPORT uint16_t picprog_ds33_ds24_read_application_id(PICPROG_HANDLE handle)

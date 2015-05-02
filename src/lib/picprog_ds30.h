@@ -27,7 +27,6 @@ extern MY_EXPORT void picprog_ds30_read_program(PICPROG_HANDLE handle, uint16_t 
 extern MY_EXPORT void picprog_ds30_write_program(PICPROG_HANDLE handle, uint16_t *buffer, uint32_t address);
 extern MY_EXPORT void picprog_ds30_read_config_memory(PICPROG_HANDLE handle, uint16_t *buffer);
 extern MY_EXPORT void picprog_ds30_write_config_memory(PICPROG_HANDLE handle, uint16_t *buffer);
-extern MY_EXPORT uint16_t picprog_ds30_read_app_id(PICPROG_HANDLE handle);
 
 #ifdef __cplusplus
 }

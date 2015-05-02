@@ -69,6 +69,12 @@ MY_EXPORT void picprog_close(PICPROG_HANDLE handle)
     }
 }
 
+MY_EXPORT void picprog_set_all_as_input(PICPROG_HANDLE handle)
+{
+    FT_CAST(handle)->ft_port_status = 0x00;
+    FT_SetBitMode(FT_CAST(handle)->ft_handle, FT_CAST(handle)->ft_port_status, FT_BITMODE_CBUS_BITBANG);
+}
+
 MY_EXPORT void picprog_clear_all(PICPROG_HANDLE handle)
 {
     FT_CAST(handle)->ft_port_status = PICPROG_CLEAR_MCLR(FT_CAST(handle)->ft_port_status);

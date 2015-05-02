@@ -367,7 +367,7 @@ MY_EXPORT void picprog_ds33_ds24_read_program(PICPROG_HANDLE handle, uint16_t* b
  *    and so on.
  *
  */
-MY_EXPORT void picprog_ds33_ds24_write_program(PICPROG_HANDLE handle, uint16_t *buffer, uint32_t address)
+MY_EXPORT void picprog_ds33_ds24_write_program(PICPROG_HANDLE handle, uint8_t *buffer, uint32_t address)
 {
     int c;
 
@@ -388,18 +388,19 @@ MY_EXPORT void picprog_ds33_ds24_write_program(PICPROG_HANDLE handle, uint16_t *
     for(c = 0; c < 16; c++)
 	{
 		// Step 4: Initialize the read pointer (W6) and load W0:W5 with the next 4 instruction words to program.
-        picprog_ds33_ds24_write_command(handle, 0x200000 | (*buffer << 4)); // MOV #<LSW0>, W0
-        buffer++;
-        picprog_ds33_ds24_write_command(handle, 0x200001 | (*buffer << 4)); // MOV #<MSB1:MSB0>, W1
-        buffer++;
-        picprog_ds33_ds24_write_command(handle, 0x200002 | (*buffer << 4)); // MOV #<LSW1>, W2
-        buffer++;
-        picprog_ds33_ds24_write_command(handle, 0x200003 | (*buffer << 4)); // MOV #<LSW2>, W3
-        buffer++;
-        picprog_ds33_ds24_write_command(handle, 0x200004 | (*buffer << 4)); // MOV #<MSB3:MSB2>, W4
-        buffer++;
-        picprog_ds33_ds24_write_command(handle, 0x200005 | (*buffer << 4)); // MOV #<LSW3>, W5
-        buffer++;
+        uint32_t tt;
+        tt = 0x200000 | (buffer[1] << 4) | (buffer[0] << 12);
+        picprog_ds33_ds24_write_command(handle, 0x200000 | (buffer[0] << 4) | (buffer[1] << 12)); // MOV #<LSW0>, W0
+        tt = 0x200001 | (buffer[2] << 4) | (buffer[5] << 12);
+        picprog_ds33_ds24_write_command(handle, 0x200001 | (buffer[2] << 4) | (buffer[5] << 12)); // MOV #<MSB1:MSB0>, W1
+        tt = 0x200002 | (buffer[4] << 4) | (buffer[3] << 12);
+        picprog_ds33_ds24_write_command(handle, 0x200002 | (buffer[3] << 4) | (buffer[4] << 12)); // MOV #<LSW1>, W2
+        tt = 0x200003 | (buffer[7] << 4) | (buffer[6] << 12);
+        picprog_ds33_ds24_write_command(handle, 0x200003 | (buffer[6] << 4) | (buffer[7] << 12)); // MOV #<LSW2>, W3
+        tt = 0x200004 | (buffer[8] << 4) | (buffer[11] << 12);
+        picprog_ds33_ds24_write_command(handle, 0x200004 | (buffer[8] << 4) | (buffer[11] << 12)); // MOV #<MSB3:MSB2>, W4
+        tt = 0x200005 | (buffer[10] << 4) | (buffer[9] << 12);
+        picprog_ds33_ds24_write_command(handle, 0x200005 | (buffer[9] << 4) | (buffer[10] << 12)); // MOV #<LSW3>, W5
 
 		// Step 5: Set the read pointer (W6) and load the (next set of) write latches.
         picprog_ds33_ds24_write_command(handle, 0xEB0300); // CLR W6
@@ -428,6 +429,8 @@ MY_EXPORT void picprog_ds33_ds24_write_program(PICPROG_HANDLE handle, uint16_t *
         picprog_ds33_ds24_write_command(handle, 0xBB1BB6); // TBLWTL[W6++], [W7++]
         picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
         picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
+
+        buffer += (6 * 2);
 	} // Step 6: Repeat steps 4-5 sixteen times to load the write latches for 64 instructions.
 
     picprog_ds33_ds24_write_command(handle, 0xA8E761); // BSET NVMCON, #WR
@@ -511,6 +514,8 @@ MY_EXPORT void picprog_ds33_ds24_write_config_memory(PICPROG_HANDLE handle, uint
     for(c = 0; c < 12; c++)
 	{
 		// Step 5: Load the Configuration register data to W6.
+        uint32_t tt;
+        tt = 0x200000 | (*buffer << 4);
         picprog_ds33_ds24_write_command(handle, 0x200000 | (*buffer << 4)); // MOV #<CONFIG_VALUE>, W0
 
 		// Step 6: Write the Configuration register data to the write latch and increment the write pointer.

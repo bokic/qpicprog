@@ -24,7 +24,7 @@ extern MY_EXPORT void picprog_ds33_ds24_write_command(PICPROG_HANDLE handle, uin
 extern MY_EXPORT uint16_t picprog_ds33_ds24_read_command(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_ds33_ds24_bulk_erase(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_ds33_ds24_read_program(PICPROG_HANDLE handle, uint16_t *buffer, uint32_t address, uint32_t no_blocks);
-extern MY_EXPORT void picprog_ds33_ds24_write_program(PICPROG_HANDLE handle, uint16_t *buffer, uint32_t address);
+extern MY_EXPORT void picprog_ds33_ds24_write_program(PICPROG_HANDLE handle, uint8_t *buffer, uint32_t address);
 extern MY_EXPORT void picprog_ds33_ds24_read_config_memory(PICPROG_HANDLE handle, uint16_t *buffer);
 extern MY_EXPORT void picprog_ds33_ds24_write_config_memory(PICPROG_HANDLE handle, uint16_t *buffer);
 extern MY_EXPORT uint16_t picprog_ds33_ds24_read_app_id(PICPROG_HANDLE handle);

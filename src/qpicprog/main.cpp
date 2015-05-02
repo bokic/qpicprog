@@ -57,7 +57,11 @@ void picds33_read_test()
 
         memset(buffer, 0, sizeof(buffer));
 
+        picprog_ds33_ds24_bulk_erase(prg_handle);
+
         picprog_ds33_ds24_read_program(prg_handle, buffer, 0, 1);
+
+        picprog_ds33_ds24_exit_icsp(prg_handle);
 
         picprog_close(prg_handle);
     }
@@ -132,7 +136,7 @@ void picds33_flash_led()
     }
 }
 
-int program_pic16f87x(const QString &target_mcu, const QString &source_project, const QString &hex_file)
+/*int program_pic16f87x(const QString &target_mcu, const QString &source_project, const QString &hex_file)
 {
     return -1000;
 }
@@ -140,7 +144,7 @@ int program_pic16f87x(const QString &target_mcu, const QString &source_project, 
 int program_picds30(const QString &target_mcu, const QString &source_project, const QString &hex_file)
 {
     return -1000;
-}
+}*/
 
 int program_picds33(const QString &target_mcu, const QString &source_project, const QString &hex_file)
 {
@@ -239,7 +243,7 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
         for(int prg_segment = 0; prg_segment < prg_segments; prg_segment++)
         {
             picprog_ds33_ds24_write_program(prg_handle, (uint8_t *)buffer.constData() + (prg_segment * 256), prg_segment * 128);
-            Sleep(10);
+            adv_delaym(10);
         }
 
         //uint16_t app_id = picprog_ds33_ds24_read_app_id(prg_handle);
@@ -376,11 +380,11 @@ int main(int argc, char *argv[])
 
     if (target_mcu.startsWith("PIC16F87", Qt::CaseInsensitive))
     {
-        program_pic16f87x(target_mcu, source_project, hex_file);
+        //program_pic16f87x(target_mcu, source_project, hex_file);
     }
     else if ((target_mcu.startsWith("PICDS30", Qt::CaseInsensitive))||(target_mcu.startsWith("PIC30", Qt::CaseInsensitive)))
     {
-        program_picds30(target_mcu, source_project, hex_file);
+        //program_picds30(target_mcu, source_project, hex_file);
     }
     else if ((target_mcu.startsWith("PICDS33", Qt::CaseInsensitive))||(target_mcu.startsWith("PIC33", Qt::CaseInsensitive)))
     {

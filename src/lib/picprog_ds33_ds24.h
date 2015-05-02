@@ -16,8 +16,6 @@ extern MY_EXPORT void picprog_ds33_ds24_exit_icsp(PICPROG_HANDLE handle);
 extern MY_EXPORT uint16_t picprog_ds33_ds24_read_application_id(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_ds33_ds24_write32(PICPROG_HANDLE handle, uint32_t data);
 extern MY_EXPORT void picprog_ds33_ds24_write16(PICPROG_HANDLE handle, uint16_t data);
-extern MY_EXPORT uint8_t picprog_ds33_ds24_read_bit(PICPROG_HANDLE handle);
-extern MY_EXPORT void picprog_ds33_ds24_wait_for_recieve_ready(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_ds33_ds24_read_buffer(PICPROG_HANDLE handle, void* buffer, uint32_t size);
 extern MY_EXPORT uint32_t picprog_ds33_ds24_sanity_check(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_ds33_ds24_write_command(PICPROG_HANDLE handle, uint32_t command);

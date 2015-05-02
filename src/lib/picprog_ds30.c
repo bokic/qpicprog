@@ -85,6 +85,7 @@ MY_EXPORT void picprog_ds30_read_buffer(PICPROG_HANDLE handle, void* buffer, uin
 
 MY_EXPORT uint32_t picprog_ds30_sanity_check(PICPROG_HANDLE handle)
 {
+    return 0;
 }
 
 MY_EXPORT void picprog_ds30_write_command(PICPROG_HANDLE handle, uint32_t command)
@@ -215,7 +216,7 @@ MY_EXPORT void picprog_ds30_bulk_erase(PICPROG_HANDLE handle)
 
 MY_EXPORT void picprog_ds30_read_program(PICPROG_HANDLE handle, uint16_t* buffer, uint32_t address, uint32_t no_blocks)
 {
-    int block;
+    uint32_t block;
 
     // Step 1: Exit Reset Vector
     picprog_ds30_write_command(handle, 0x040100); // GOTO 0x100

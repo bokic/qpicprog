@@ -1,5 +1,7 @@
 #include <picprog.h>
 
+#include <stdlib.h>
+
 #include <assert.h>
 
 #define PICPROG_MCLR_SET               0x01
@@ -43,6 +45,7 @@ MY_EXPORT PICPROG_HANDLE picprog_open()
 {
     PICPROG_HANDLE ret = NULL;
     FT_HANDLE ft_handle;
+
     if (FT_OpenEx("PicProg", FT_OPEN_BY_DESCRIPTION, &ft_handle) == FT_OK)
     {
         ret = malloc(sizeof(struct FT_PicProgHandle));

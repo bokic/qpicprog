@@ -95,16 +95,6 @@ MY_EXPORT void picprog_ds33_ds24_write16(PICPROG_HANDLE handle, uint16_t data)
 	}
 }
 
-MY_EXPORT uint8_t picprog_ds33_ds24_read_bit(PICPROG_HANDLE handle)
-{
-    return 0;
-}
-
-MY_EXPORT void picprog_ds33_ds24_wait_for_recieve_ready(PICPROG_HANDLE handle)
-{
-    // TODO: Implement me.
-}
-
 MY_EXPORT void picprog_ds33_ds24_read_buffer(PICPROG_HANDLE handle, void* buffer, uint32_t size)
 {
     uint16_t *word = (uint16_t *)buffer;

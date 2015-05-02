@@ -10,6 +10,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include <stdio.h>
+
 
 MY_EXPORT void picprog_ds_enter_icsp(PICPROG_HANDLE handle)
 {
@@ -189,7 +191,7 @@ MY_EXPORT void picprog_ds_write_command(PICPROG_HANDLE handle, uint32_t command)
     picprog_toggle_clock(handle);picprog_toggle_clock(handle);
     adv_delayn(100);
 
-    /*if (picprog_get_first_commmand(handle) == true)
+    if (picprog_get_first_commmand(handle) == true)
 	{
         picprog_toggle_clock(handle);picprog_toggle_clock(handle);
         picprog_toggle_clock(handle);picprog_toggle_clock(handle);
@@ -199,7 +201,7 @@ MY_EXPORT void picprog_ds_write_command(PICPROG_HANDLE handle, uint32_t command)
         adv_delayn(100);
 		
         picprog_set_first_commmand(handle, false);
-    }*/
+    }
 	
     for(c = 0; c < 24; c++)
 	{
@@ -294,10 +296,21 @@ MY_EXPORT void picprog_ds_bulk_erase(PICPROG_HANDLE handle)
 			break;
 	}
 
-    adv_delaym(330);
+    //adv_delaym(330);
 }
 
-MY_EXPORT void picprog_ds_read_program(PICPROG_HANDLE handle, uint16_t* buffer, uint32_t address, uint32_t size)
+/**
+ * void picprog_ds_read_program(PICPROG_HANDLE handle, uint16_t* buffer, uint32_t address, uint32_t no_blocks)
+ *
+ * @param handle - PicProg handle
+ * @param buffer - Address of the buffer
+ * @param address - Address in words
+ * @param no_blocks - Number of 12byte blocks
+ *
+ * @return nothing
+ *
+ */
+MY_EXPORT void picprog_ds_read_program(PICPROG_HANDLE handle, uint16_t* buffer, uint32_t address, uint32_t no_blocks)
 {
     uint32_t c;
 
@@ -311,7 +324,7 @@ MY_EXPORT void picprog_ds_read_program(PICPROG_HANDLE handle, uint16_t* buffer, 
     picprog_ds_write_command(handle, 0x880190); // MOV W0, TBLPAG
     picprog_ds_write_command(handle, 0x200006 | ((address & 0x0000FFFF) << 4)); // MOV #<SourceAddress15:0>, W6
 
-    for(c = 0; c < size; c++)
+    for(c = 0; c < no_blocks; c++)
 	{
 		// Step 3: Initialize the write pointer (W7) and store the next four locations of code memory to W0:W5.
         picprog_ds_write_command(handle, 0xEB0380); // CLR W7
@@ -373,6 +386,13 @@ MY_EXPORT void picprog_ds_read_program(PICPROG_HANDLE handle, uint16_t* buffer, 
     picprog_ds_write_command(handle, 0x000000); // NOP
 }
 
+/**
+ *
+ *    byteoffset 192 = 0x200807
+ *    byteoffset 384 = 0x201007
+ *    and so on.
+ *
+ */
 MY_EXPORT void picprog_ds_write_program(PICPROG_HANDLE handle, uint16_t *buffer, uint32_t address)
 {
     int c;

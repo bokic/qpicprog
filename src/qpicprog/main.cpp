@@ -1,4 +1,4 @@
-#include <QCoreApplication>
+#include <QApplication>
 #include <QStringList>
 #include <QMessageBox>
 
@@ -34,25 +34,17 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
         return -331;
     }
 
-    picprog_ds_enter_icsp(prg_handle);
-
-    uint16_t app_id = picprog_ds_read_application_id(prg_handle);
-    if (app_id != 0xCB)
-    {
-
-    }
-
-    //uint32_t sanity = picprog_ds_sanity_check(prg_handle);
-
-    picprog_ds_bulk_erase(prg_handle);
-
-    QByteArray buffer;
-    buffer.resize(128 * 1024); // 128KB
-    memset(buffer.data(), 0xff, buffer.length());
-
     if (hex.load(hex_file))
     {
         QList<QHexRow> data = hex.data();
+
+        picprog_ds_enter_icsp(prg_handle);
+
+        picprog_ds_bulk_erase(prg_handle);
+
+        QByteArray buffer;
+        buffer.resize(128 * 1024); // 128KB
+        memset(buffer.data(), 0xff, buffer.length());
 
         // chip erase
 
@@ -68,6 +60,7 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
             memcpy(buffer.data() + row.m_Address, segment.constData(), segment.length());
         }
 
+        /// Program code memory
         int firmware_size = 0;
 
         for(int pos = buffer.length() - 1; pos >= 0; pos--)
@@ -85,47 +78,67 @@ int program_picds33(const QString &target_mcu, const QString &source_project, co
             prg_segments++;
         }
 
-        for(int temp = 0; temp < 2048; temp++)
-        {
-            buffer[temp] = (uint8_t)temp;
-        }
-
         buffer.resize(prg_segments * 192);
 
         for(int prg_segment = 0; prg_segment < prg_segments; prg_segment++)
         {
-            picprog_ds_write_program(prg_handle, (uint16_t *)buffer.constData() + (prg_segment * (192 / 2)), prg_segment * (192 / 2));
+            picprog_ds_write_program(prg_handle, (uint16_t *)(buffer.constData() + (prg_segment * 192)), prg_segment * 128);
             Sleep(10);
         }
+
+        /// Verify program code
+        QByteArray verify_buffer;
+        verify_buffer.resize(buffer.size());
+
+        picprog_ds_read_program(prg_handle, (uint16_t *)verify_buffer.data(), 0, buffer.size() / (2 * 6));
+
+        if (buffer != verify_buffer)
+        {
+            QMessageBox::critical(NULL, QObject::tr("Error"), QObject::tr("Verify code memory failed."));
+            ret = -334;
+        }
+
+        /// Program & Verify config memory
+        if (data.count() > 2)
+        {
+            QByteArray config_data = data.at(data.count() - 2).m_Data;
+
+            if (config_data.length() > 24)
+            {
+                config_data.resize(24);
+
+                picprog_ds_write_config_memory(prg_handle, (uint16_t *)config_data.data());
+
+                QByteArray verify_config_data;
+
+                verify_config_data.resize(24);
+
+                picprog_ds_read_config_memory(prg_handle, (uint16_t *)verify_config_data.data());
+
+                if (config_data != verify_config_data)
+                {
+                    QMessageBox::critical(NULL, QObject::tr("Error"), QObject::tr("Verify config memory failed."));
+                    ret = -332;
+                }
+            }
+        }
+
+        picprog_ds_exit_icsp(prg_handle);
+
+        picprog_close(prg_handle);
     }
     else
     {
         QMessageBox::critical(NULL, QObject::tr("Error"), QObject::tr("Corrupted hex file."));
-        ret = -332;
-    }
-
-    QByteArray verify_buffer;
-    verify_buffer.resize(buffer.size());
-    memset(verify_buffer.data(), 31, verify_buffer.length());
-
-    picprog_ds_read_program(prg_handle, (uint16_t *)verify_buffer.data(), 0, buffer.size() / (2 * 6));
-
-    if (buffer != verify_buffer)
-    {
-        QMessageBox::critical(NULL, QObject::tr("Error"), QObject::tr("Verify failed."));
         ret = -333;
     }
-
-    picprog_ds_exit_icsp(prg_handle);
-
-    picprog_close(prg_handle);
 
     return ret;
 }
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     QString target_mcu;
     QString source_project;
@@ -174,11 +187,11 @@ int main(int argc, char *argv[])
     {
         program_pic16f87x(target_mcu, source_project, hex_file);
     }
-    else if (target_mcu.startsWith("PICDS30", Qt::CaseInsensitive))
+    else if ((target_mcu.startsWith("PICDS30", Qt::CaseInsensitive))||(target_mcu.startsWith("PIC30", Qt::CaseInsensitive)))
     {
         program_picds30(target_mcu, source_project, hex_file);
     }
-    else if (target_mcu.startsWith("PICDS33", Qt::CaseInsensitive))
+    else if ((target_mcu.startsWith("PICDS33", Qt::CaseInsensitive))||(target_mcu.startsWith("PIC33", Qt::CaseInsensitive)))
     {
         program_picds33(target_mcu, source_project, hex_file);
     }

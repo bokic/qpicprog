@@ -23,7 +23,7 @@ extern MY_EXPORT uint32_t picprog_ds_sanity_check(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_ds_write_command(PICPROG_HANDLE handle, uint32_t command);
 extern MY_EXPORT uint16_t picprog_ds_read_command(PICPROG_HANDLE handle);
 extern MY_EXPORT void picprog_ds_bulk_erase(PICPROG_HANDLE handle);
-extern MY_EXPORT void picprog_ds_read_program(PICPROG_HANDLE handle, uint16_t *buffer, uint32_t address, uint32_t size);
+extern MY_EXPORT void picprog_ds_read_program(PICPROG_HANDLE handle, uint16_t *buffer, uint32_t address, uint32_t no_blocks);
 extern MY_EXPORT void picprog_ds_write_program(PICPROG_HANDLE handle, uint16_t *buffer, uint32_t address);
 extern MY_EXPORT void picprog_ds_read_config_memory(PICPROG_HANDLE handle, uint16_t *buffer);
 extern MY_EXPORT void picprog_ds_write_config_memory(PICPROG_HANDLE handle, uint16_t *buffer);

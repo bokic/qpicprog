@@ -5,7 +5,7 @@
 #include <windows.h>
 #endif
 
-#include <stdbool.h>
+//#include <stdbool.h>
 #include <stdint.h>
 
 uint32_t usec = 0;

@@ -1,7 +1,7 @@
 #include "picprog_16f87x.h"
 #include "advanced_delay.h"
 
-#include <stdbool.h>
+//#include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 

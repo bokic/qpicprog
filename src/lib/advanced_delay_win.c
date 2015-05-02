@@ -54,32 +54,36 @@ MY_EXPORT void adv_delayu(uint32_t interval)
 #ifdef __GNUC__
 //#pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
-#endif
 
 inline uint64_t RDTSC()
 {
     __asm__("RDTSC\n");
 }
 
-#ifdef __GNUC__
 #pragma GCC diagnostic warning "-Wreturn-type"
 //#pragma GCC diagnostic pop
+#elif defined _MSC_VER
+#define RDTSC() (__rdtsc())
+#else
+#error Unsupported compiler.
 #endif
 
 MY_EXPORT void adv_delayn(uint32_t interval)
 {
-    uint64_t start = RDTSC();
+    uint64_t current, cycles, start;
+
+    start = RDTSC();
 
     if (usec == 0)
     {
         adv_delay_setup();
     }
 
-    uint64_t cycles = (usec * interval) / 1000;
+    cycles = (usec * interval) / 1000;
 
-    while(true)
+    while(1)
     {
-        uint64_t current = RDTSC();
+        current = RDTSC();
         if ((current <= 0xffffffff)&&(start > 0xffffffff))
         {
             if (~(start - current) >= cycles)

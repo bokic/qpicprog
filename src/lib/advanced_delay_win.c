@@ -51,10 +51,19 @@ MY_EXPORT void adv_delayu(uint32_t interval)
     adv_delayn(interval * 1000);
 }
 
-uint64_t RDTSC()
+#ifdef __GNUC__
+//#pragma GCC diagnostic(push)
+//#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
+
+inline uint64_t RDTSC()
 {
     __asm__("RDTSC\n");
 }
+
+#ifdef __GNUC__
+//#pragma GCC diagnostic pop
+#endif
 
 MY_EXPORT void adv_delayn(uint32_t interval)
 {

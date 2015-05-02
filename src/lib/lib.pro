@@ -13,11 +13,13 @@ DEFINES        += LIB_EXPORT
 SOURCES         = \
     picprog_16f87x.c \
     picprog.c \
-    picprog_ds.c
+	picprog_ds33_ds24.c \
+	picprog_ds30.c
 HEADERS         = \
     picprog_16f87x.h \
     picprog.h \
-    picprog_ds.h
+	picprog_ds33_ds24.h \
+	picprog_ds30.h
 
 win32:SOURCES  += advanced_delay_win.c
 unix:SOURCES   += advanced_delay_unix.c

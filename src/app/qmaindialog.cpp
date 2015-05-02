@@ -1,7 +1,6 @@
 #include "qmaindialog.h"
 #include "ui_qmaindialog.h"
 
-#include "qadvancedtimer.h"
 #include "qhexloader.h"
 
 #include <QFileDialog>
@@ -13,7 +12,7 @@ QMainDialog::QMainDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QAdvancedTimer::setup();
+    //QAdvancedTimer::setup();
 
     /*m_LptPorts = QLptPort::enumLptPorts();
 
@@ -89,8 +88,6 @@ void QMainDialog::on_programAllFromFileFilenameLabel_linkActivated(QString link)
 
 void QMainDialog::on_programAllFromFileButton_clicked()
 {
-    QAdvancedTimer::waitn(100);
-
     if (m_FileName == "")
         on_programAllFromFileFilenameLabel_linkActivated("filename");
 

@@ -13,8 +13,8 @@ struct QHexRow{
 class QHexLoader : public QObject
 {
 public:
-    QHexLoader();
-	bool Load(const QString& p_Filename);
+    QHexLoader(const QString &p_Filename = "", QObject *parent = NULL);
+    bool Load(const QString &p_Filename);
 
     QList<QHexRow> m_Rows;
 };

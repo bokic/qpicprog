@@ -33,7 +33,6 @@ MY_EXPORT void adv_delay_setup()
             RegCloseKey(l_RegistryKey);
 
             usec = l_MHz;
-
         }
     }
 }
@@ -53,79 +52,40 @@ MY_EXPORT void adv_delayu(uint32_t interval)
     adv_delayn(interval * 1000);
 }
 
+uint64_t RDTSC()
+{
+    __asm__ (
+        "   RDTSC\n"
+    );
+}
+
 MY_EXPORT void adv_delayn(uint32_t interval)
 {
+    uint64_t start = RDTSC();
+
     if (usec == 0)
     {
         adv_delay_setup();
     }
 
-    cycles = usec * interval / 1000;
+    cycles = (usec * interval) / 1000;
 
-#if defined(__x86_64__)
-    __asm__ __volatile__ (
-        "   push %rax\n"
-        "   push %rbx\n"
-        "   push %rcx\n"
-        "   push %rdx\n"
-        "   push %rsi\n"
-        "   RDTSC\n"
-        "   mov %edx, %esi\n"
-        "   addl $_cycles, %eax\n"
-        "   jnc NoOverlap\n"
-        "   inc %edx\n"
-        "NoOverlap:\n"
-        "   mov %eax, %ebx\n"
-        "   mov %edx, %ecx\n"
-        "Loop1:\n"
-        "   RDTSC\n"
-        "   cmp %edx, %esi\n"
-        "   jb Loop3\n"
-        "   cmp %ecx, %edx\n"
-        "   jne Loop1\n"
-        "Loop2:\n"
-        "   cmp %ebx, %eax\n"
-        "   jbe Loop1\n"
-
-        "Loop3:\n"
-        "   pop %rsi\n"
-        "   pop %rdx\n"
-        "   pop %rcx\n"
-        "   pop %rbx\n"
-        "   pop %rax\n"
-    );
-#else
-    __asm__ __volatile__ (
-        "   push %eax\n"
-        "   push %ebx\n"
-        "   push %ecx\n"
-        "   push %edx\n"
-        "   push %esi\n"
-
-        "   RDTSC\n"
-        "   mov %edx, %esi\n"
-        "   addl $_cycles, %eax\n"
-        "   jnc NoOverlap\n"
-        "   inc %edx\n"
-        "NoOverlap:\n"
-        "   mov %eax, %ebx\n"
-        "   mov %edx, %ecx\n"
-        "Loop1:\n"
-        "   RDTSC\n"
-        "   cmp %edx, %esi\n"
-        "   jb Loop3\n"
-        "   cmp %ecx, %edx\n"
-        "   jne Loop1\n"
-        "Loop2:\n"
-        "   cmp %ebx, %eax\n"
-        "   jbe Loop1\n"
-
-        "Loop3:\n"
-        "   pop %esi\n"
-        "   pop %edx\n"
-        "   pop %ecx\n"
-        "   pop %ebx\n"
-        "   pop %eax\n"
-    );
-#endif
+    while(true)
+    {
+        uint64_t current = RDTSC();
+        if ((current <= 0xffffffff)&&(start > 0xffffffff))
+        {
+            if (~(start - current) >= cycles)
+            {
+                break;
+            }
+        }
+        else
+        {
+            if (current - start >= cycles)
+            {
+                break;
+            }
+        }
+    }
 }

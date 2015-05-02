@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file alias="icon_16">res/qtpicprog_16.png</file>
-        <file alias="icon_32">res/qtpicprog_32.png</file>
+        <file alias="icon_16">res/qpicprog_16.png</file>
+        <file alias="icon_32">res/qpicprog_32.png</file>
     </qresource>
 </RCC>

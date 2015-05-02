@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>QtPicProg v1.0</string>
+   <string>QPicProg v1.0</string>
   </property>
   <property name="windowIcon">
    <iconset resource="resource.qrc">

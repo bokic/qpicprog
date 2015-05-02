@@ -2,8 +2,13 @@
 #include <QString>
 #include <QFile>
 
-QHexLoader::QHexLoader()
+QHexLoader::QHexLoader(const QString &p_Filename, QObject *parent)
+    : QObject(parent)
 {
+    if (!p_Filename.isEmpty())
+    {
+        Load(p_Filename);
+    }
 }
 
 bool QHexLoader::Load(const QString& p_Filename)

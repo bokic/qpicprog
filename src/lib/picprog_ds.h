@@ -1,27 +1,27 @@
-#ifndef PICPROG_DS_H
-#define PICPROG_DS_H
+#ifndef PICPROG_DSPIC_H
+#define PICPROG_DSPIC_H
+
+#include "advanced_delay.h"
+#include "picprog.h"
+#include "export.h"
 
 #include <stdint.h>
 
+extern MY_EXPORT void picprog_ds_enter_icsp(PICPROG_HANDLE handle);
+extern MY_EXPORT void picprog_ds_exit_icsp(PICPROG_HANDLE handle);
+extern MY_EXPORT void picprog_ds_write32(PICPROG_HANDLE handle, uint32_t data);
+extern MY_EXPORT void picprog_ds_write16(PICPROG_HANDLE handle, uint16_t data);
+extern MY_EXPORT uint8_t picprog_ds_read_bit(PICPROG_HANDLE handle);
+extern MY_EXPORT void picprog_ds_wait_for_recieve_ready(PICPROG_HANDLE handle);
+extern MY_EXPORT void picprog_ds_read_buffer(PICPROG_HANDLE handle, void* buffer, uint32_t size);
+extern MY_EXPORT uint32_t picprog_ds_sanity_check(PICPROG_HANDLE handle);
+extern MY_EXPORT void picprog_ds_write_command(PICPROG_HANDLE handle, uint32_t command);
+extern MY_EXPORT uint16_t picprog_ds_read_command(PICPROG_HANDLE handle);
+extern MY_EXPORT void picprog_ds_bulk_erase(PICPROG_HANDLE handle);
+extern MY_EXPORT void picprog_ds_read_program(PICPROG_HANDLE handle, uint16_t *buffer, uint32_t address, uint32_t size);
+extern MY_EXPORT void picprog_ds_write_program(PICPROG_HANDLE handle, uint16_t *buffer, uint32_t address);
+extern MY_EXPORT void picprog_ds_read_config_memory(PICPROG_HANDLE handle, uint16_t *buffer);
+extern MY_EXPORT void picprog_ds_write_config_memory(PICPROG_HANDLE handle, uint16_t *buffer);
+extern MY_EXPORT uint16_t picprog_ds_read_app_id(PICPROG_HANDLE handle);
 
-extern void PICds_Clr_All();
-extern void PICds_Set_MCLR();
-
-extern void PICds_EnterICSP();
-extern void PICds_ExitICSP();
-
-extern void PICds_write32(uint32_t);
-
-extern uint32_t PICds_SanityCheck();
-
-extern void PICds_ReadConfigMem(uint16_t *);
-extern void PICds_WriteConfigMem(uint16_t *);
-extern void PICds_BuldErase();
-extern void PICds_ReadC(uint16_t *, uint32_t, uint32_t);
-extern void PICds_WriteC(uint16_t*, uint32_t);
-
-extern uint16_t PICds_ReadAppID();
-
-extern void LightUpLED();
-
-#endif // PICPROG_DS_H
+#endif // PICPROG_DSPIC_H

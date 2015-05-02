@@ -132,10 +132,13 @@ MY_EXPORT void picprog_ds33_ds24_read_buffer(PICPROG_HANDLE handle, void* buffer
 
 MY_EXPORT uint32_t picprog_ds33_ds24_sanity_check(PICPROG_HANDLE handle)
 {
+    uint16_t ret1;
+    uint16_t ret2;
+
     picprog_ds33_ds24_write_command(handle, 0x0001);
 
-    uint16_t ret1 = picprog_ds33_ds24_read_command(handle);
-    uint16_t ret2 = picprog_ds33_ds24_read_command(handle);
+    ret1 = picprog_ds33_ds24_read_command(handle);
+    ret2 = picprog_ds33_ds24_read_command(handle);
 
     return (uint32_t)(ret1 << 16) | ret2;
 
@@ -227,6 +230,8 @@ MY_EXPORT uint16_t picprog_ds33_ds24_read_command(PICPROG_HANDLE handle)
 
 MY_EXPORT void picprog_ds33_ds24_bulk_erase(PICPROG_HANDLE handle)
 {
+    uint16_t NVMCON;
+
 	// Step 1: Exit the Reset vector.
     picprog_ds33_ds24_write_command(handle, 0x040200); // GOTO 0x200
     picprog_ds33_ds24_write_command(handle, 0x040200); // GOTO 0x200
@@ -251,7 +256,7 @@ MY_EXPORT void picprog_ds33_ds24_bulk_erase(PICPROG_HANDLE handle)
         picprog_ds33_ds24_write_command(handle, 0x803B00); // MOV NVMCON, W0
         picprog_ds33_ds24_write_command(handle, 0x883C20); // MOV W0, VISI
         picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
-        uint16_t NVMCON = picprog_ds33_ds24_read_command(handle);
+        NVMCON = picprog_ds33_ds24_read_command(handle);
         picprog_ds33_ds24_write_command(handle, 0x040200); // GOTO 0x200
         picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
 
@@ -358,6 +363,7 @@ MY_EXPORT void picprog_ds33_ds24_read_program(PICPROG_HANDLE handle, uint16_t* b
  */
 MY_EXPORT void picprog_ds33_ds24_write_program(PICPROG_HANDLE handle, uint8_t *buffer, uint32_t address)
 {
+    uint16_t NVMCON;
     int c;
 
 	// Step 1: Exit Reset Vector
@@ -428,7 +434,7 @@ MY_EXPORT void picprog_ds33_ds24_write_program(PICPROG_HANDLE handle, uint8_t *b
         picprog_ds33_ds24_write_command(handle, 0x803B00); // MOV NVMCON, W0
         picprog_ds33_ds24_write_command(handle, 0x883C20); // MOV W0, VISI
         picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
-        uint16_t NVMCON = picprog_ds33_ds24_read_command(handle);
+        NVMCON = picprog_ds33_ds24_read_command(handle);
         picprog_ds33_ds24_write_command(handle, 0x040200); // GOTO 0x200
         picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
 
@@ -476,6 +482,7 @@ MY_EXPORT void picprog_ds33_ds24_read_config_memory(PICPROG_HANDLE handle, uint1
 
 MY_EXPORT void picprog_ds33_ds24_write_config_memory(PICPROG_HANDLE handle, uint16_t *buffer)
 {
+    uint16_t NVMCON;
     int c;
 
 	// Step 1: Exit Reset Vector
@@ -518,7 +525,7 @@ MY_EXPORT void picprog_ds33_ds24_write_config_memory(PICPROG_HANDLE handle, uint
             picprog_ds33_ds24_write_command(handle, 0x803B00); // MOV NVMCON, W0
             picprog_ds33_ds24_write_command(handle, 0x883C20); // MOV W0, VISI
             picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
-            uint16_t NVMCON = picprog_ds33_ds24_read_command(handle);
+            NVMCON = picprog_ds33_ds24_read_command(handle);
             picprog_ds33_ds24_write_command(handle, 0x040200); // GOTO 0x200
             picprog_ds33_ds24_write_command(handle, 0x000000); // NOP
 

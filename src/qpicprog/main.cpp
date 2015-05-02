@@ -182,6 +182,9 @@ int program_picds30(const QString &target_mcu, const QString &source_project, co
 
 int program_picds33(const QString &target_mcu, const QString &source_project, const QString &hex_file)
 {
+    Q_UNUSED(target_mcu);
+    Q_UNUSED(source_project);
+
     QHexLoader hex;
     int ret;
 

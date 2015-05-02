@@ -3,7 +3,7 @@ CONFIG   += debug_and_release
 TARGET    = testapp
 DESTDIR   = ../../bin
 
-RC_FILE   = testapp.rc
+#RC_FILE   = testapp.rc
 
 INCLUDEPATH += ../lib ../common
 DEPENDPATH  += ../lib ../common

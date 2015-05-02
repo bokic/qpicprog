@@ -100,7 +100,7 @@ void QMainDialog::on_programAllFromFileButton_clicked()
     {
         QByteArray buf;
         buf.resize(128 * 1024); // TODO: Get len from programmer member.
-        buf.fill(0xFF);
+        buf.fill(-1); // 0xff
 
         for(int c = 0; c < l_Hex.data().length(); c++)
         {
